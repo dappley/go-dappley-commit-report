@@ -70,7 +70,7 @@ func compose(branch string) (string, string, bool){
 
 	//Compose the commit information section of the email
 	commitMsgScanner := bufio.NewScanner(strings.NewReader(commitMSG))
-	for i := 0; commitMsgScanner.Scan(); i++ {
+	for i := 0; commitMsgScanner.Scan() && i < 7; i++ {
 		MSG := commitMsgScanner.Text()
 		if i == 6 {
 			MSG = "<br> Commit Summary: " + MSG
