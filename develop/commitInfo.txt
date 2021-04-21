@@ -1,0 +1,7 @@
+commit a435284225cc86f31bd72937dfd03f2983df224e
+Author:     Heesoo Hwang <heesoohwang1231@gmail.com>
+AuthorDate: Mon Apr 19 14:17:36 2021 -0700
+Commit:     Heesoo Hwang <heesoohwang1231@gmail.com>
+CommitDate: Mon Apr 19 14:17:36 2021 -0700
+
+    Delete EmailOnPush.go

@@ -10,38 +10,46 @@ import (
 )
 
 func main() {
-	var change, testResult, commitInfo, sender, senderPasswd string
-	flag.StringVar(&change,       "change",       "change.txt",        "Changes made in the new commit")
-	flag.StringVar(&testResult,   "testResult",   "log.txt",           "Test result file")
-	flag.StringVar(&commitInfo,   "commitInfo",   "commit info",       "default commit info")
-	flag.StringVar(&sender,       "sender",       "sender_username@example.com", "Email address of the sender")
-	flag.StringVar(&senderPasswd, "senderPasswd", "PASSWORD",          "Password of the sender's email address.")
+	var senderEmail, senderPasswd string
+	flag.StringVar(&senderEmail, "senderEmail", "sender_username@example.com", "Email address of the sender")
+	flag.StringVar(&senderPasswd, "senderPasswd", "PASSWORD", "Password of the sender's email address.")
 	flag.Parse()
 
-	committer, emailContent, fail_exists := compose(testResult, commitInfo)
-	if fail_exists {
-		send(emailContent, change, testResult, committer, sender, senderPasswd)
-		fmt.Println("Email sent to committer:", committer)
+	dev_committer, dev_email, dev_fail := compose("develop")
+	master_committer, master_email, master_fail := compose("master")
+	
+	//send develop branch info
+	if dev_fail {
+		send(dev_email, "develop", dev_committer, senderEmail, senderPasswd)
+		fmt.Println("Email sent to develop branch committer:", dev_committer)
 	} else {
-		fmt.Println("ALL TESTS PASSED!")
+		fmt.Println("No fail case on develop branch!")
+	}
+
+	//send master branch info
+	if master_fail {
+		send(master_email, "master", master_committer, senderEmail, senderPasswd)
+		fmt.Println("Email sent to master branch committer:", master_committer)
+	} else {
+		fmt.Println("No fail case on master branch!")
 	}
 }
 
-func compose(testResult string, commitInfo string) (string, string, bool){
+func compose(branch string) (string, string, bool){
 	var committer string
 	sendEmail := false
 
 	//read log file
-	testMSG_byte, err := ioutil.ReadFile(testResult)
+	testMSG_byte, err := ioutil.ReadFile(branch + "/log.txt")
 	if err != nil {
-		fmt.Printf("Failed to read file \"%s\"", testResult)
+		fmt.Printf("Failed to read from origin/%s branch", branch)
 		return "", "", sendEmail
 	}
 
 	//read commitInfo file
-	commitMSG_byte, err := ioutil.ReadFile(commitInfo)
+	commitMSG_byte, err := ioutil.ReadFile(branch + "/commitInfo.txt")
 	if err != nil {
-		fmt.Printf("Failed to read file \"%s\"", commitInfo)
+		fmt.Printf("Failed to read from origin/%s branch", branch)
 		return "", "", sendEmail
 	}
 
@@ -88,8 +96,10 @@ func compose(testResult string, commitInfo string) (string, string, bool){
 	}
 	emailContents_testInfo += "</p>"
 
+	branch_info := "<p>Origin/" + branch + "::</p>"
+
 	//Merge both sections together
-	emailContents := emailContents_commit + emailContents_testInfo
+	emailContents := branch_info + emailContents_commit + emailContents_testInfo
 
 	return committer, emailContents, sendEmail
 }
@@ -111,18 +121,18 @@ func between(value string, a string, b string) string {
     return value[posFirstAdjusted:posLast]
 }
 
-func send(emailBody string, change string, testResult string, committer string, sender string, senderPasswd string) {
+func send(emailBody string, branch string, committer string, senderEmail string, senderPasswd string) {
 	//send the email
 	mail := gomail.NewMessage()
-	mail.SetHeader("From", sender)
+	mail.SetHeader("From", senderEmail)
 	mail.SetHeader("To",   committer)
 	//mail.SetAddressHeader("Cc", "dan@example.com", "Dan")
-	mail.SetHeader("Subject", "Go-Dappley Commit Test Result")
+	mail.SetHeader("Subject", "Go-Dappley Commit Test Result - " + branch)
 	mail.SetBody("text/html", emailBody)
-	mail.Attach(change)
-	mail.Attach(testResult)
+	mail.Attach(branch + "/change.txt")
+	mail.Attach(branch + "/log.txt")
 
-	deliver := gomail.NewDialer("smtp.gmail.com", 587, sender, senderPasswd)
+	deliver := gomail.NewDialer("smtp.gmail.com", 587, senderEmail, senderPasswd)
 
 	if err := deliver.DialAndSend(mail); err != nil {
 		panic(err)
