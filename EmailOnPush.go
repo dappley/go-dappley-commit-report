@@ -19,16 +19,18 @@ func main() {
 	master_committer, master_email, master_fail := compose("master")
 
 	fmt.Println("Branch: develop")
-	fmt.Println("Committer:", dev_committer, "\n")
+	fmt.Println("Committer:", dev_committer)
+	fmt.Println()
 	fmt.Println(dev_email)
 	
 	fmt.Println("Branch: master")
-	fmt.Println("Committer:", master_committer, "\n")
+	fmt.Println("Committer:", master_committer)
+	fmt.Println()
 	fmt.Println(master_email)
 	
 	//send develop branch info
 	if dev_fail {
-		//send(dev_email, "develop", dev_committer, senderEmail, senderPasswd)
+		send(dev_email, "develop", dev_committer, senderEmail, senderPasswd)
 		fmt.Println("Email sent to develop branch committer:", dev_committer)
 	} else {
 		fmt.Println("No fail case on develop branch!")
@@ -36,7 +38,7 @@ func main() {
 
 	//send master branch info
 	if master_fail {
-		//send(master_email, "master", master_committer, senderEmail, senderPasswd)
+		send(master_email, "master", master_committer, senderEmail, senderPasswd)
 		fmt.Println("Email sent to master branch committer:", master_committer)
 	} else {
 		fmt.Println("No fail case on master branch!")
