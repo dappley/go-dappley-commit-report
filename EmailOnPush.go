@@ -135,8 +135,7 @@ func send(emailBody string, branch string, committer string, senderEmail string,
 	//send the email
 	mail := gomail.NewMessage()
 	mail.SetHeader("From", senderEmail)
-	fmt.Println(committer)
-	mail.SetHeader("To",   "blockchainwarning@omnisolu.com")
+	mail.SetHeader("To",   committer)
 	//mail.SetAddressHeader("Cc", "dan@example.com", "Dan")
 	mail.SetHeader("Subject", "Go-Dappley Commit Test Result - " + branch)
 	mail.SetBody("text/html", emailBody)

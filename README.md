@@ -78,6 +78,7 @@ pipeline {
 }
 ```
 
+
 ### Jenkins Pipeline 2:
 ```
 pipeline {
@@ -86,7 +87,7 @@ pipeline {
         go 'go-1.16.3'
     }
     environment {
-        GO1157MODULE = 'on'
+        GO1163MODULE = 'on'
     }
     stages {
         stage('SCM Checkout') {
@@ -101,20 +102,13 @@ pipeline {
                 sh 'go build EmailOnPush.go'
             }
         }
-        // stage('Deploy') {
-        //     steps {
-        //         sh "./EmailOnPush -change change.txt -testResult log.txt -commitInfo commitInfo.txt -sender username@example.com -senderPasswd password"
-        //     }
-        // }
+        stage('Deploy') {
+            steps {
+                sh "./EmailOnPush -senderEmail <EMAIL ADDRESS> -senderPasswd <PASSWORD>"
+            }
+        }
         stage('Close') {
             steps {
-                // sh 'rm EmailOnPush'
-                // sh 'rm log_master.txt'
-                // sh 'rm log_develop.txt'
-                // sh 'rm change_master.txt'
-                // sh 'rm change_develop.txt'
-                // sh 'rm commitInfo_master.txt'
-                // sh 'rm commitInfo_develop.txt'
                 sh 'rm -r *'
             }
         }
