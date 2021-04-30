@@ -77,6 +77,7 @@ pipeline {
     }
 }
 ```
+
 ### Jenkins Pipeline 2:
 ```
 pipeline {
