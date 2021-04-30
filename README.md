@@ -28,16 +28,15 @@ pipeline {
         // }
         stage('Test Master Branch') {
             steps {
-                sh 'git show > change_master.txt'
-                sh 'make testall > log_master.txt'
-                sh 'git log --pretty=fuller HEAD^..HEAD > commitInfo_master.txt'
+                sh 'mkdir master'
+                sh 'git show > master/change.txt'
+                sh 'make testall > master/log.txt'
+                sh 'git log --pretty=fuller HEAD^..HEAD > master/commitInfo.txt'
             }
         }
         stage('Move Master Files') {
             steps {
-                sh 'mv change_master.txt ../go-dappley-commit-report'
-                sh 'mv log_master.txt ../go-dappley-commit-report'
-                sh 'mv commitInfo_master.txt ../go-dappley-commit-report'
+                sh 'mv master ../go-dappley-commit-report'
             }
         }
         stage('Clear Master Directory') {
@@ -57,16 +56,15 @@ pipeline {
         // }
         stage('Test Develop Branch') {
             steps {
-                sh 'git show > change_develop.txt'
-                sh 'make testall > log_develop.txt'
-                sh 'git log --pretty=fuller HEAD^..HEAD > commitInfo_develop.txt'
+                sh 'mkdir develop'
+                sh 'git show > develop/change.txt'
+                sh 'make testall > develop/log.txt'
+                sh 'git log --pretty=fuller HEAD^..HEAD > develop/commitInfo.txt'
             }
         }
         stage('Move Develop Files') {
             steps {
-                sh 'mv change_develop.txt ../go-dappley-commit-report'
-                sh 'mv log_develop.txt ../go-dappley-commit-report'
-                sh 'mv commitInfo_develop.txt ../go-dappley-commit-report'
+                sh 'mv develop ../go-dappley-commit-report'
             }
         }
         stage('Clear Develop Directory') {
