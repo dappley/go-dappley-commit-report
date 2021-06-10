@@ -132,10 +132,21 @@ func between(value string, a string, b string) string {
 }
 
 func send(emailBody string, branch string, committer string, senderEmail string, senderPasswd string) {
+	default_recipients := []string{"wulize1994@gmail.com", "rshi@omnisolu.com", "ilshiyi@omnisolu.com"}
 	//send the email
 	mail := gomail.NewMessage()
 	mail.SetHeader("From", senderEmail)
-	mail.SetHeader("To",   committer)
+
+	if contains(default_recipients, committer) {
+		mail.SetHeader("To", "wulize1994@gmail.com", 
+							 "rshi@omnisolu.com", 
+							 "ilshiyi@omnisolu.com")
+	} else {
+		mail.SetHeader("To", "wulize1994@gmail.com", 
+							 "rshi@omnisolu.com", 
+							 "ilshiyi@omnisolu.com",
+							 committer)
+	}
 	//mail.SetAddressHeader("Cc", "dan@example.com", "Dan")
 	mail.SetHeader("Subject", "Go-Dappley Commit Test Result - " + branch)
 	mail.SetBody("text/html", emailBody)
@@ -147,4 +158,14 @@ func send(emailBody string, branch string, committer string, senderEmail string,
 	if err := deliver.DialAndSend(mail); err != nil {
 		panic(err)
 	}
+}
+
+//Checks if slice contains the given value
+func contains(slice []string, val string) bool {
+	for _, elem := range slice {
+		if elem == val {
+			return true
+		}
+	}
+	return false
 }
