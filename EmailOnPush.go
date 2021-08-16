@@ -3,10 +3,12 @@ package main
 import (
 	"gopkg.in/gomail.v2"
 	"io/ioutil"
+	"net/mail"
 	"strings"
 	"bufio"
 	"flag"
 	"fmt"
+	"log"
 )
 
 func main() {
@@ -132,21 +134,33 @@ func between(value string, a string, b string) string {
 }
 
 func send(emailBody string, branch string, committer string, senderEmail string, senderPasswd string) {
-	default_recipients := []string{"wulize1994@gmail.com", "rshi@omnisolu.com", "ilshiyi@omnisolu.com"}
+	var recipients []string
+
+	file_byte, err := ioutil.ReadFile("recipients.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	scanner := bufio.NewScanner(strings.NewReader(string(file_byte)))
+	for scanner.Scan() {
+		line := scanner.Text()
+		if !valid_email(line) {
+			fmt.Println("Invalid email address: \"" + line + "\"")
+			continue
+		}
+		recipients = append(recipients, line)
+	}
+
 	//send the email
 	mail := gomail.NewMessage()
 	mail.SetHeader("From", senderEmail)
-
-	if contains(default_recipients, committer) {
-		mail.SetHeader("To", "wulize1994@gmail.com", 
-							 "rshi@omnisolu.com", 
-							 "ilshiyi@omnisolu.com")
-	} else {
-		mail.SetHeader("To", "wulize1994@gmail.com", 
-							 "rshi@omnisolu.com", 
-							 "ilshiyi@omnisolu.com",
-							 committer)
+	if !contains(recipients, committer) {
+		recipients = append(recipients, committer)
 	}
+	addresses := make([]string, len(recipients))
+	for i, recipient := range recipients {
+		addresses[i] = mail.FormatAddress(recipient, "")
+	}
+	mail.SetHeader("To", addresses...)
 	//mail.SetAddressHeader("Cc", "dan@example.com", "Dan")
 	mail.SetHeader("Subject", "Go-Dappley Commit Test Result - " + branch)
 	mail.SetBody("text/html", emailBody)
@@ -168,4 +182,10 @@ func contains(slice []string, val string) bool {
 		}
 	}
 	return false
+}
+
+//Checks the validity of the email address
+func valid_email(email string) bool {
+    _, err := mail.ParseAddress(email)
+    return err == nil
 }
