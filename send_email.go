@@ -30,9 +30,9 @@ func sendEmail(emailBody string, branch string, committer string, senderEmail st
 	//send the email
 	mail := gomail.NewMessage()
 	mail.SetHeader("From", senderEmail)
-	// if !contains(recipients, committer) {
-	// 	recipients = append(recipients, committer)
-	// }
+	if !contains(recipients, committer) {
+		recipients = append(recipients, committer)
+	}
 	addresses := make([]string, len(recipients))
 	for i, recipient := range recipients {
 		addresses[i] = mail.FormatAddress(recipient, "")
