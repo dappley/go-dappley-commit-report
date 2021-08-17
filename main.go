@@ -1,15 +1,23 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
+	"log"
 )
 
 func main() {
 	var senderEmail, senderPasswd string
-	flag.StringVar(&senderEmail, "senderEmail", "sender_username@example.com", "Email address of the sender")
-	flag.StringVar(&senderPasswd, "senderPasswd", "PASSWORD", "Password of the sender's email address.")
+	flag.StringVar(&senderEmail, "senderEmail", "default_email", "Email address of the sender")
+	flag.StringVar(&senderPasswd, "senderPasswd", "default_password", "Password of the sender's email address.")
 	flag.Parse()
+
+	err := checkFlags(senderEmail, senderPasswd)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
 
 	dev_committer, dev_email, dev_fail := composeEmail("develop")
 	master_committer, master_email, master_fail := composeEmail("master")
@@ -32,4 +40,17 @@ func main() {
 	} else {
 		fmt.Println("No fail case on master branch!")
 	}
+}
+
+//----------Helper----------
+func checkFlags(email string, password string) (err error) {
+	switch {
+	case email == "default_email":
+		err = errors.New("Error: Email is missing!")
+	case password == "default_password":
+		err = errors.New("Error: Password is missing!")
+	default:
+		err = nil
+	}
+	return err
 }
