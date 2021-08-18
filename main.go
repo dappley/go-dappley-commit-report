@@ -15,10 +15,7 @@ func main() {
 	flag.Parse()
 
 	err := helper.CheckFlags(senderEmail, senderPasswd)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
+	if err != nil { log.Fatal(err) }
 
 	dev_committer, dev_email, dev_fail := email.ComposeEmail("develop")
 	master_committer, master_email, master_fail := email.ComposeEmail("master")
