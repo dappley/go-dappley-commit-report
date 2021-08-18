@@ -1,16 +1,17 @@
-package main
+package email
 
 import (
+	"github.com/heesooh/go-dappley-commit-report/helper"
 	"gopkg.in/gomail.v2"
 	"io/ioutil"
-	"net/mail"
 	"strings"
 	"bufio"
 	"log"
 	"fmt"
 )
 
-func sendEmail(emailBody string, branch string, committer string, senderEmail string, senderPasswd string) {
+//Send commit-report email to the recipients specified in the "recipients.txt" file.
+func SendEmail(emailBody string, branch string, committer string, senderEmail string, senderPasswd string) {
 	var recipients []string
 
 	file_byte, err := ioutil.ReadFile("recipients.txt")
@@ -20,7 +21,7 @@ func sendEmail(emailBody string, branch string, committer string, senderEmail st
 	scanner := bufio.NewScanner(strings.NewReader(string(file_byte)))
 	for scanner.Scan() {
 		line := scanner.Text()
-		if !valid_email(line) {
+		if !helper.Valid_email(line) {
 			fmt.Println("Invalid email address: \"" + line + "\"")
 			continue
 		}
@@ -30,7 +31,7 @@ func sendEmail(emailBody string, branch string, committer string, senderEmail st
 	//send the email
 	mail := gomail.NewMessage()
 	mail.SetHeader("From", senderEmail)
-	if !contains(recipients, committer) {
+	if !helper.Contains(recipients, committer) {
 		recipients = append(recipients, committer)
 	}
 	addresses := make([]string, len(recipients))
@@ -49,20 +50,4 @@ func sendEmail(emailBody string, branch string, committer string, senderEmail st
 	if err := deliver.DialAndSend(mail); err != nil {
 		panic(err)
 	}
-}
-
-//Checks if slice contains the given value
-func contains(slice []string, val string) bool {
-	for _, elem := range slice {
-		if elem == val {
-			return true
-		}
-	}
-	return false
-}
-
-//Checks the validity of the email address
-func valid_email(email string) bool {
-    _, err := mail.ParseAddress(email)
-    return err == nil
 }

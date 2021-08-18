@@ -1,14 +1,15 @@
-package main
+package email
 
 import (
+	"github.com/heesooh/go-dappley-commit-report/helper"
 	"io/ioutil"
 	"strings"
 	"bufio"
 	"fmt"
 )
 
-
-func composeEmail(branch string) (string, string, bool){
+//Compose the email message content for the go-dappley-commit-report.
+func ComposeEmail(branch string) (string, string, bool){
 	var committer string
 	sendEmail := false
 
@@ -44,7 +45,7 @@ func composeEmail(branch string) (string, string, bool){
 		} else {
 			if strings.Contains(MSG, "<") {
 				if strings.Contains(MSG, "Commit:") {
-					committer = between(MSG, "<", ">")
+					committer = helper.Between(MSG, "<", ">")
 				}
 				MSG = strings.Replace(MSG, "<", "", -1)
 				MSG = strings.Replace(MSG, ">", "", -1)
@@ -75,21 +76,4 @@ func composeEmail(branch string) (string, string, bool){
 	emailContents := branch_info + emailContents_commit + emailContents_testInfo
 
 	return committer, emailContents, sendEmail
-}
-
-func between(value string, a string, b string) string {
-    // Get substring between two strings.
-    posFirst := strings.Index(value, a)
-    if posFirst == -1 {
-        return ""
-    }
-    posLast := strings.Index(value, b)
-    if posLast == -1 {
-        return ""
-    }
-    posFirstAdjusted := posFirst + len(a)
-    if posFirstAdjusted >= posLast {
-        return ""
-    }
-    return value[posFirstAdjusted:posLast]
 }
