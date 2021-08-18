@@ -15,9 +15,7 @@ func SendEmail(emailBody string, branch string, committer string, senderEmail st
 	var recipients []string
 
 	file_byte, err := ioutil.ReadFile("recipients.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
+	if err != nil { log.Fatal(err) }
 	scanner := bufio.NewScanner(strings.NewReader(string(file_byte)))
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -39,14 +37,12 @@ func SendEmail(emailBody string, branch string, committer string, senderEmail st
 		addresses[i] = mail.FormatAddress(recipient, "")
 	}
 	mail.SetHeader("To", addresses...)
-	//mail.SetAddressHeader("Cc", "dan@example.com", "Dan")
 	mail.SetHeader("Subject", "Go-Dappley Commit Test Result - " + branch)
 	mail.SetBody("text/html", emailBody)
 	mail.Attach(branch + "/change.txt")
 	mail.Attach(branch + "/log.txt")
 
 	deliver := gomail.NewDialer("smtp.gmail.com", 587, senderEmail, senderPasswd)
-
 	if err := deliver.DialAndSend(mail); err != nil {
 		panic(err)
 	}

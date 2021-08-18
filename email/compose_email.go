@@ -9,28 +9,23 @@ import (
 )
 
 //Compose the email message content for the go-dappley-commit-report.
-func ComposeEmail(branch string) (string, string, bool){
-	var committer string
-	sendEmail := false
-
-	//read log file
+func ComposeEmail(branch string) (committer string, emailContents string, sendEmail bool){
+	//read log.txt file.
 	testMSG_byte, err := ioutil.ReadFile(branch + "/log.txt")
 	if err != nil {
 		fmt.Printf("Failed to read from origin/%s branch", branch)
-		return "", "", sendEmail
+		return
 	}
-
-	//read commitInfo file
+	//read commitInfo.txt file.
 	commitMSG_byte, err := ioutil.ReadFile(branch + "/commitInfo.txt")
 	if err != nil {
 		fmt.Printf("Failed to read from origin/%s branch", branch)
-		return "", "", sendEmail
+		return
 	}
 
-	//convert to string
+	//convert to string.
 	testMSG   := string(testMSG_byte)
 	commitMSG := string(commitMSG_byte)
-
 	emailContents_commit   := "<p>Committer Information:"
 	emailContents_testInfo := "<p>Failing Tests Information:"
 
@@ -69,11 +64,8 @@ func ComposeEmail(branch string) (string, string, bool){
 		}
 	}
 	emailContents_testInfo += "</p>"
-
 	branch_info := "<p>Origin/" + branch + "::</p>"
+	emailContents = branch_info + emailContents_commit + emailContents_testInfo
 
-	//Merge both sections together
-	emailContents := branch_info + emailContents_commit + emailContents_testInfo
-
-	return committer, emailContents, sendEmail
+	return
 }

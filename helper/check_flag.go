@@ -14,5 +14,5 @@ func CheckFlags(email string, password string) (err error) {
 	default:
 		err = nil
 	}
-	return err
+	return
 }
